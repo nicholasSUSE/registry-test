@@ -4,3 +4,4 @@ aws/terraform.tfvars
 aws/.terraform.lock.hcl
 aws/terraform.tfstate*
 aws/.terraform
+aws/certs/*

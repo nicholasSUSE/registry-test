@@ -6,9 +6,9 @@ INSTANCE_DNS=$(terraform output -raw workload_1_dns)
 
 function destroy() {
 	terraform destroy --auto-approve || true
-	rm -Rf .terraform || true
-	rm .terraform.lock.hcl || true
-	rm terraform.tfstate* || true
+	# rm -Rf .terraform || true
+	# rm .terraform.lock.hcl || true
+	# rm terraform.tfstate* || true
 }
 
 function init() {
@@ -40,9 +40,6 @@ function tls_docker() {
   # Restart Docker to apply the changes
   sudo systemctl restart docker
 }
-
-
-
 
 destroy
 init

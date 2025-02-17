@@ -27,6 +27,13 @@ cd $AWS_DIR
 INSTANCE_DNS=$(terraform output -raw workload_1_dns)
 cd $WORK_DIR
 
+docker login $INSTANCE_DNS
+
+echo "List Repos on OCI Registry"
+curl -X GET https://$INSTANCE_DNS/v2/_catalog --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt --insecure
+
+echo "List tags (versions)"
+echo "curl -X GET https://$INSTANCE_DNS/v2/<repository-name>/tags/list --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt --insecure"
 
 
 # Disable command logging
