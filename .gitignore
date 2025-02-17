@@ -1,1 +1,2 @@
-oci-test/*
+oci-test/*  # Ignore everything inside oci-test
+!oci-test/  # But *don't* ignore the directory itself
