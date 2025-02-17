@@ -73,60 +73,83 @@ function setupRegistry() {
     cd $WORK_DIR
 
     docker login $INSTANCE_DNS
-    set +x
 
-    directory="./oci-test/assets/fleet"
+    assets_path="./oci-test/assets"
+    assets_dir=($(find "$assets_path" -maxdepth 1 -type d -print0 | xargs -0))
 
-    # Get the list of files and store it in an array
-    files_array=($(find "$directory" -maxdepth 1 -type f -print0 | xargs -0))
-
-    # Loop through the array of files
-    for file in "${files_array[@]}"; do
-        helm push $file oci://$INSTANCE_DNS --ca-file /etc/docker/certs.d/$INSTANCE_DNS/ca.crt --insecure-skip-tls-verify
+    for dir in "${assets_dir[@]}"; do
+        # Get the list of files and store it in an array
+        files_array=($(find "$dir" -maxdepth 1 -type f -print0 | xargs -0))
+        # Loop through the array of files
+        for file in "${files_array[@]}"; do
+            helm push $file oci://$INSTANCE_DNS --ca-file /etc/docker/certs.d/$INSTANCE_DNS/ca.crt
+        done
     done
 
     echo "List Repos on OCI Registry"
     curl -X GET https://$INSTANCE_DNS/v2/_catalog --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt --insecure
-
-    echo "List tags (versions)"
-    echo "curl -X GET https://$INSTANCE_DNS/v2/<repository-name>/tags/list --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt --insecure"
-    set -x
 }
 
 
+function checkRegistry() {
+    cd $WORK_DIR
 
+    curl -X GET https://$INSTANCE_DNS/v2/fleet/tags/list --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt
 
+    curl -X GET https://$INSTANCE_DNS/v2/fleet-agent/tags/list --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt
 
+    curl -X GET https://$INSTANCE_DNS/v2/fleet-crd/tags/list --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt
 
-# Disable command logging
-set +x
+    curl -X GET https://$INSTANCE_DNS/v2/rancher-logging/tags/list --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt
 
-echo -e "________________________________________________________\n"
-echo -e "TLS Docker registry setup complete\n"
+    curl -X GET https://$INSTANCE_DNS/v2/rancher-logging-crd/tags/list --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt
 
-echo -e "INSTANCE_DNS=$INSTANCE_DNS\n"
+    curl -X GET https://$INSTANCE_DNS/v2/rancher-monitoring/tags/list --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt
 
-echo -e "Next steps: \n"
-echo "1. Log in to Docker"
-echo -e "docker login \$INSTANCE_DNS \n"
+    curl -X GET https://$INSTANCE_DNS/v2/rancher-monitoring-crd/tags/list --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt
 
-echo "2. List repositories"
-echo -e "curl -X GET https://\$INSTANCE_DNS/v2/_catalog --cacert /etc/docker/certs.d/\$INSTANCE_DNS/ca.crt --insecure \n"
+    curl -X GET https://$INSTANCE_DNS/v2/sriov/tags/list --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt
 
-echo "3. List tags (versions)"
-echo "curl -X GET https://\$INSTANCE_DNS/v2/<repository-name>/tags/list --cacert /etc/docker/certs.d/\$INSTANCE_DNS/ca.crt --insecure \n"
+    curl -X GET https://$INSTANCE_DNS/v2/sriov-crd/tags/list --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt
 
-echo "4. Push an image"
-echo -e "helm push ../assets/rancher-istio/rancher-istio-104.2.0+up1.20.3.tgz oci://\$INSTANCE_DNS --ca-file /etc/docker/certs.d/\$INSTANCE_DNS/ca.crt --insecure-skip-tls-verify \n"
+    curl -X GET https://$INSTANCE_DNS/v2/_catalog --cacert /etc/docker/certs.d/$INSTANCE_DNS/ca.crt --insecure
+}
 
-echo "5. Pull an image"
-echo -e "helm pull oci://\$INSTANCE_DNS/rancher-istio:104.2.0+up1.20.3 --ca-file /etc/docker/certs.d/\$INSTANCE_DNS/ca.crt --insecure-skip-tls-verify --debug \n"
+function helper() {
+    cd $WORK_DIR
 
-# Re-enable command logging
-set -x
+    # Disable command logging
+    set +x
+
+    echo -e "________________________________________________________\n"
+    echo -e "TLS Docker registry setup complete\n"
+
+    echo -e "INSTANCE_DNS=$INSTANCE_DNS\n"
+
+    echo -e "Next steps: \n"
+    echo "1. Log in to Docker"
+    echo -e "docker login \$INSTANCE_DNS \n"
+
+    echo "2. List repositories"
+    echo -e "curl -X GET https://\$INSTANCE_DNS/v2/_catalog --cacert /etc/docker/certs.d/\$INSTANCE_DNS/ca.crt --insecure \n"
+
+    echo "3. List tags (versions)"
+    echo "curl -X GET https://\$INSTANCE_DNS/v2/<repository-name>/tags/list --cacert /etc/docker/certs.d/\$INSTANCE_DNS/ca.crt --insecure \n"
+
+    echo "4. Push an image"
+    echo -e "helm push ../assets/rancher-istio/rancher-istio-104.2.0+up1.20.3.tgz oci://\$INSTANCE_DNS --ca-file /etc/docker/certs.d/\$INSTANCE_DNS/ca.crt --insecure-skip-tls-verify \n"
+
+    echo "5. Pull an image"
+    echo -e "helm pull oci://\$INSTANCE_DNS/rancher-istio:104.2.0+up1.20.3 --ca-file /etc/docker/certs.d/\$INSTANCE_DNS/ca.crt --insecure-skip-tls-verify --debug \n"
+
+    # Re-enable command logging
+    set -x
+}
 
 
 setupGIT
 initTerraform
 tls_docker
 setupRegistry
+checkRegistry
+helper
