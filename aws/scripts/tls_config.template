@@ -1,0 +1,90 @@
+#!/bin/bash -x
+exec > /var/log/tls_config.log 2>&1
+set -x
+
+PUBLIC_DNS=$(curl -s http://169.254.169.254/latest/meta-data/public-hostname)
+
+# Define the OpenSSL configuration content
+OPENSSL_CONFIG="
+[ req ]
+default_bits       = 2048
+distinguished_name = req_distinguished_name
+req_extensions     = req_ext
+x509_extensions    = v3_ca # The extensions to add to the self-signed cert
+
+[ req_distinguished_name ]
+countryName                = Country Name (2 letter code)
+countryName_default        = US
+stateOrProvinceName        = State or Province Name (full name)
+stateOrProvinceName_default= California
+localityName               = Locality Name (eg, city)
+localityName_default       = San Francisco
+organizationName           = Organization Name (eg, company)
+organizationName_default   = My Company
+commonName                 = Common Name (e.g. server FQDN or YOUR name)
+commonName_default         = $PUBLIC_DNS
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ v3_ca ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1   = $PUBLIC_DNS
+"
+
+# Create the OpenSSL configuration file
+echo "$OPENSSL_CONFIG" > openssl.cnf
+
+# Verify the creation of the OpenSSL configuration file
+if [ -f openssl.cnf ]; then
+  echo "OpenSSL configuration file created successfully."
+else
+  echo "Failed to create OpenSSL configuration file."
+  exit 1
+fi
+
+# Generate a private key
+openssl genrsa -out domain.key 2048
+
+# Generate a certificate signing request (CSR) using the configuration file
+openssl req -new -key domain.key -out domain.csr -config openssl.cnf -batch
+
+# Verify the creation of the CSR
+if [ -f domain.csr ]; then
+  echo "CSR created successfully."
+else
+  echo "Failed to create CSR."
+  exit 1
+fi
+
+# Generate the self-signed certificate with SANs
+openssl x509 -req -days 365 -in domain.csr -signkey domain.key -out domain.crt -extensions v3_ca -extfile openssl.cnf
+
+# Verify the creation of the certificate
+if [ -f domain.crt ]; then
+  echo "Certificate created successfully."
+else
+  echo "Failed to create certificate."
+  exit 1
+fi
+
+# Create the directory for the certificate
+sudo mkdir -p /etc/docker/certs.d/$PUBLIC_DNS
+
+# Copy the certificate and key to the directory
+sudo cp domain.crt /etc/docker/certs.d/$PUBLIC_DNS/
+sudo cp domain.key /etc/docker/certs.d/$PUBLIC_DNS/
+
+# Verify the files in the directory
+ls -l /etc/docker/certs.d/$PUBLIC_DNS/
+
+# Run the Docker registry with TLS
+docker run -d -p 443:443 \
+  --name registry \
+  -v /etc/docker/certs.d/$PUBLIC_DNS:/certs \
+  -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
+  -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+  registry:2
