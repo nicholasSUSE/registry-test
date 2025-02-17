@@ -1,2 +1,6 @@
 oci-test/*  # Ignore everything inside oci-test
 !oci-test/  # But *don't* ignore the directory itself
+aws/terraform.tfvars
+aws/.terraform.lock.hcl
+aws/terraform.tfstate*
+aws/.terraform
