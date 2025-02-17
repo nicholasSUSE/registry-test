@@ -20,17 +20,17 @@ resource "aws_instance" "instance" {
   }
 
   # upload files
-  provisioner "file" {
-    source      = "./certs/server-ca.crt"
-    destination = "/home/ubuntu/server-ca.crt"
+  # provisioner "file" {
+  #   source      = "./certs/server-ca.crt"
+  #   destination = "/home/ubuntu/server-ca.crt"
 
-    connection {
-      type        = "ssh"
-      host        = self.public_ip
-      user        = "ubuntu"
-      private_key = tls_private_key.global_key.private_key_pem
-    }
-  }
+  #   connection {
+  #     type        = "ssh"
+  #     host        = self.public_ip
+  #     user        = "ubuntu"
+  #     private_key = tls_private_key.global_key.private_key_pem
+  #   }
+  # }
 
   # execute scripts on the newly created instance.
   provisioner "remote-exec" {
