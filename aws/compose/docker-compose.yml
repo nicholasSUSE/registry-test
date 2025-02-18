@@ -14,10 +14,10 @@ services:
       - REGISTRY_HTTP_TLS_KEY=/certs/domain.key
     restart: always
 
-  prometheus:
-    image: prom/prometheus:v2.30.3
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    restart: always
+  # prometheus:
+  #   image: prom/prometheus:v2.30.3
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+  #   restart: always

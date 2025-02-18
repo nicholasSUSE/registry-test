@@ -44,17 +44,17 @@ resource "aws_instance" "instance" {
     }
   }
 
-  provisioner "file" {
-    source      = "./compose/prometheus.yml"
-    destination = "/home/ubuntu/prometheus.yml"
+  # provisioner "file" {
+  #   source      = "./compose/prometheus.yml"
+  #   destination = "/home/ubuntu/prometheus.yml"
 
-    connection {
-      type        = "ssh"
-      host        = self.public_ip
-      user        = "ubuntu"
-      private_key = tls_private_key.global_key.private_key_pem
-    }
-  }
+  #   connection {
+  #     type        = "ssh"
+  #     host        = self.public_ip
+  #     user        = "ubuntu"
+  #     private_key = tls_private_key.global_key.private_key_pem
+  #   }
+  # }
 
   # execute scripts on the newly created instance.
   provisioner "remote-exec" {

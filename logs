@@ -1,6 +1,0 @@
-149.19.175.54 - - [18/Feb/2025:14:40:24 +0000] "GET /v2/sriov-crd/tags/list HTTP/2.0" 200 210 "" "curl/8.9.1"
-149.19.175.54 - - [18/Feb/2025:14:40:24 +0000] "GET /v2/_catalog HTTP/2.0" 200 159 "" "curl/8.9.1"
-time="2025-02-18T14:40:24.754373954Z" level=info msg="response completed" go.version=go1.20.8 http.request.host=ec2-3-145-19-150.us-east-2.compute.amazonaws.com http.request.id=0a92098d-7afd-4299-9663-17d9c3b3194c http.request.method=GET http.request.remoteaddr="149.19.175.54:42492" http.request.uri="/v2/_catalog" http.request.useragent="curl/8.9.1" http.response.contenttype="application/json; charset=utf-8" http.response.duration=3.329547ms http.response.status=200 http.response.written=159
-172.18.0.2 - - [18/Feb/2025:14:40:26 +0000] "GET /metrics HTTP/1.1" 404 19 "" "Prometheus/2.30.3"
-172.18.0.2 - - [18/Feb/2025:14:40:41 +0000] "GET /metrics HTTP/1.1" 404 19 "" "Prometheus/2.30.3"
-172.18.0.2 - - [18/Feb/2025:14:40:56 +0000] "GET /metrics HTTP/1.1" 404 19 "" "Prometheus/2.30.3"

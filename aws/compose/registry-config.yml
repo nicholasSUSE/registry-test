@@ -18,5 +18,5 @@ health:
     interval: 10s
     threshold: 3
 prometheus:
-  enabled: true
+  enabled: false
   path: /metrics
