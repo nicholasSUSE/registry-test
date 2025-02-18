@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  registry:
+    image: registry:2
+    ports:
+      - "443:443"
+    volumes:
+      - /etc/docker/certs.d/${PUBLIC_DNS}:/certs
+      - ./registry-config.yml:/etc/docker/registry/config.yml
+    environment:
+      - REGISTRY_HTTP_ADDR=0.0.0.0:443
+      - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt
+      - REGISTRY_HTTP_TLS_KEY=/certs/domain.key
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:v2.30.3
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: always

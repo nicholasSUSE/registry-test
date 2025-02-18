@@ -81,10 +81,20 @@ sudo cp domain.key /etc/docker/certs.d/$PUBLIC_DNS/
 ls -l /etc/docker/certs.d/$PUBLIC_DNS/
 
 # Run the Docker registry with TLS
-docker run -d -p 443:443 \
-  --name registry \
-  -v /etc/docker/certs.d/$PUBLIC_DNS:/certs \
-  -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
-  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
-  -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
-  registry:2
+# docker run -d -p 443:443 \
+#   --name registry \
+#   -v /etc/docker/certs.d/$PUBLIC_DNS:/certs \
+#   -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+#   -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
+#   -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+#   registry:2
+
+
+# Export PUBLIC_DNS to be system-wide available
+echo "export PUBLIC_DNS=$PUBLIC_DNS" | sudo tee -a /etc/profile.d/docker_registry_env.sh > /dev/null
+
+# Source the environment file to make the variable available in the current shell
+source /etc/profile.d/docker_registry_env.sh
+cd /home/ubuntu
+pwd
+docker-compose up -d

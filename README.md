@@ -2,6 +2,14 @@
 
 Automate the deploy of an EC2 AWS instance with a basic OCI Registry signing it with a self-signed CA.
 
+### Needed packages
+
+- terraform
+- gcr
+- jq
+- docker
+
+
 ### How-to
 
 #### Deploy EC2 Instance with self-signed certificate
@@ -17,17 +25,19 @@ Automate the deploy of an EC2 AWS instance with a basic OCI Registry signing it 
 2. Configure your aws zone; prefix and etc... at `aws/terraform.tfvars`:
 
   ```
-  user = "#####"
-  prefix = "####"
+  user = "#####" (you choose)
+  prefix = "####" (you choose)
   aws_region = "us-east-2"
   aws_zone = "us-east-2a"
   instance_type = "t3a.2xlarge"
   ```
 
-3. At `aws/` folder:
+3. Run `run.sh` with sudo
 
+  Beware this will erase all your local docker configurations!
+  Check `tls_docker` function at `run.sh`
   ```
-  terraform init && terraform apply --auto-approve
+  sudo ./run.sh
   ```
 
 #### Configure your dev environment to the OCI Registry with the self-signed certificate

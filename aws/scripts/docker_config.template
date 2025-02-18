@@ -41,3 +41,6 @@ sudo sshd -T | grep allowtcpforwarding
 
 echo "Restarting docker service"
 sudo systemctl restart docker
+
+# Also install docker-compose
+sudo apt install docker-compose -y
